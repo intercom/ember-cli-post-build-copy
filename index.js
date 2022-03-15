@@ -21,9 +21,18 @@ module.exports = {
       self.log("ember-cli-post-build-copy: copying from "+results.directory+".");
       if(self.configObject && self.configObject["ember-cli-post-build-copy"]){
         let copyConfig = self.configObject["ember-cli-post-build-copy"];
+
         let replace = false;
         if(copyConfig.replace){
           replace = copyConfig.replace
+        }
+
+        let fsExtraConfig = {};
+        if (copyConfig.fsExtra) {
+          fsExtraConfig = copyConfig.fsExtra;
+        }
+        if (fsExtraConfig.overwrite === undefined) {
+          fsExtraConfig.overwrite = replace;
         }
 
         if(copyConfig[self.buildEnv]){
@@ -35,7 +44,7 @@ module.exports = {
               let dest = path.resolve(pair[1])
               self.log("ember-cli-post-build-copy: copying "+src+" to "+dest);
               try {
-                fs.copySync(src, dest, { clobber: replace });
+                fs.copySync(src, dest, fsExtraConfig);
               } catch (err) {
                 console.error('Oh no, there was an error: ' + err.message)
               }
